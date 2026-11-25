@@ -1,0 +1,37 @@
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Database backups and dumps
+*.sql
+*.sql.gz
+*.dump
+
+# SSL certificates and private keys
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+frontend/dist/
+backend/dist/
+
+# Editor files
+.vscode/
+.idea/
