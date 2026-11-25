@@ -1,3 +1,4 @@
+
 const express = require('express');
 const cors = require('cors');
 const db = require('./config/db');
@@ -12,13 +13,30 @@ const tablesRoutes = require('./routes/tables');
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 
-// Allow the React app on localhost / 127.0.0.1 (any Vite port)
+// Allowed frontend origins
+const allowedOrigins = [
+  'https://samir2530107.github.io'
+];
+
+// CORS configuration
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+    // Allow requests without an Origin (e.g., server-to-server or curl)
+    if (!origin) {
       return callback(null, true);
     }
-    return callback(null, false);
+
+    // Allow GitHub Pages production website
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // Allow local development on localhost or 127.0.0.1
+    if (/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Origin not allowed by CORS'));
   }
 }));
 
@@ -33,16 +51,26 @@ app.get('/', (req, res) => {
   });
 });
 
-// Health check: shows whether MySQL is reachable
+// Health check
 app.get('/api/health', async (req, res) => {
   try {
     await db.testConnection();
-    res.json({ success: true, server: 'ok', database: 'connected' });
+    res.json({
+      success: true,
+      server: 'ok',
+      database: 'connected'
+    });
   } catch (error) {
-    res.status(503).json({ success: false, server: 'ok', database: 'disconnected', message: error.message });
+    res.status(503).json({
+      success: false,
+      server: 'ok',
+      database: 'disconnected',
+      message: error.message
+    });
   }
 });
 
+// API routes
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/regional', regionalRoutes);
 app.use('/api/gender', genderRoutes);
@@ -52,40 +80,55 @@ app.use('/api/tables', tablesRoutes);
 
 // Unknown routes
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: 'API endpoint not found' });
+  res.status(404).json({
+    success: false,
+    message: 'API endpoint not found'
+  });
 });
 
-// Global error handler (4 arguments are required by Express)
-// eslint-disable-next-line no-unused-vars
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('Server error:', err.message);
-  res.status(500).json({ success: false, message: 'Internal server error' });
+
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error'
+  });
 });
 
-// A crash in one request must never stop the server
-process.on('unhandledRejection', reason => console.error('Unhandled rejection:', reason));
-process.on('uncaughtException', error => console.error('Uncaught exception:', error.message));
+// Handle unexpected errors
+process.on('unhandledRejection', reason => {
+  console.error('Unhandled rejection:', reason);
+});
 
+process.on('uncaughtException', error => {
+  console.error('Uncaught exception:', error.message);
+});
+
+// Start server
 const server = app.listen(PORT, async () => {
   console.log('--------------------------------------');
   console.log('South Korea Labor Analytics API');
   console.log(`Server:   http://localhost:${PORT}`);
   console.log('Database: south_korea_labor_market');
+
   try {
     await db.testConnection();
     console.log('MySQL:    connected');
   } catch (error) {
     console.log(`MySQL:    NOT CONNECTED (${error.code || error.message})`);
-    console.log('          Start MySQL and check backend/config/db.js');
+    console.log('          Check backend/config/db.js');
   }
+
   console.log('--------------------------------------');
 });
 
 server.on('error', error => {
   if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use. Close the other backend window and try again.`);
+    console.error(`Port ${PORT} is already in use.`);
   } else {
     console.error('Server error:', error.message);
   }
+
   process.exit(1);
 });
