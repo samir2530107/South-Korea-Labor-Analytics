@@ -57,7 +57,7 @@ function ViewTables() {
       <div className="welcome-section">
         <h2>Database Tables</h2>
         <p>
-          Browse every table in <strong>south_korea_labor_market</strong>.
+          Browse every table in <strong>South Korea Labor Market</strong>.
           View only: rows are shown in ID order and cannot be changed here.
         </p>
       </div>
@@ -70,7 +70,7 @@ function ViewTables() {
             className={`table-tab ${table.name === activeName ? 'active' : ''}`}
             onClick={() => chooseTable(table.name)}
           >
-            <span>{table.name}</span>
+            <span>{table.label || table.name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</span>
             <small>{table.rows.toLocaleString()} rows</small>
           </button>
         ))}
@@ -82,7 +82,7 @@ function ViewTables() {
             <h3>{activeInfo?.label ?? activeName}</h3>
             <p>
               {result
-                ? `Showing ${from.toLocaleString()}–${to.toLocaleString()} of ${result.total.toLocaleString()} rows`
+                ? `Showing ${from.toLocaleString()}??{to.toLocaleString()} of ${result.total.toLocaleString()} rows`
                 : 'Loading...'}
               <span className="readonly-badge">READ ONLY</span>
             </p>
@@ -127,14 +127,14 @@ function ViewTables() {
         ) : (
           <>
             <div className={tableData.loading ? 'table-wrap fading' : 'table-wrap'}>
-              <DataTable columns={result.columns} rows={result.rows} startIndex={startIndex} />
+              <DataTable columns={result.columns} rows={result.rows} startIndex={startIndex} presorted />
             </div>
 
             <div className="pagination">
               <button type="button" className="btn" disabled={result.page <= 1} onClick={() => setPage(1)}>« First</button>
-              <button type="button" className="btn" disabled={result.page <= 1} onClick={() => setPage(result.page - 1)}>‹ Prev</button>
+              <button type="button" className="btn" disabled={result.page <= 1} onClick={() => setPage(result.page - 1)}>??Prev</button>
               <span>Page {result.page} of {result.totalPages}</span>
-              <button type="button" className="btn" disabled={result.page >= result.totalPages} onClick={() => setPage(result.page + 1)}>Next ›</button>
+              <button type="button" className="btn" disabled={result.page >= result.totalPages} onClick={() => setPage(result.page + 1)}>Next ??/button>
               <button type="button" className="btn" disabled={result.page >= result.totalPages} onClick={() => setPage(result.totalPages)}>Last »</button>
             </div>
           </>

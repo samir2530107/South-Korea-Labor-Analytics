@@ -8,7 +8,7 @@ import Select from '../components/Select';
 import StatCard from '../components/StatCard';
 import useFetch from '../hooks/useFetch';
 import { getUnemploymentData, getRegionalTrend } from '../services/api';
-import { baseOptions, lineDataset, lineOptions, pivotByYear, formatNumber, compact, COLORS } from '../utils/chartUtils';
+import { baseOptions, lineDataset, lineOptions, pivotByYear, formatNumber, cleanLabel, compact, COLORS } from '../utils/chartUtils';
 
 function Unemployment() {
   const [year, setYear] = useState('');
@@ -31,13 +31,13 @@ function Unemployment() {
   const average = valid.length ? valid.reduce((s, d) => s + d.unemployment_rate, 0) / valid.length : null;
 
   const barData = {
-    labels: data.map(d => d.region_name),
+    labels: data.map(d => cleanLabel(d.region_name)),
     datasets: [{ label: 'Unemployment rate (%)', data: data.map(d => d.unemployment_rate), backgroundColor: COLORS[1], borderRadius: 6 }]
   };
 
   const withPopulation = data.filter(d => d.economically_active_population !== null);
   const populationData = {
-    labels: withPopulation.map(d => d.region_name),
+    labels: withPopulation.map(d => cleanLabel(d.region_name)),
     datasets: [{
       label: 'Economically active population',
       data: withPopulation.map(d => d.economically_active_population),
@@ -52,8 +52,8 @@ function Unemployment() {
     datasets: pivot.datasets.map((d, i) => lineDataset(d.group, d.values, COLORS[i % COLORS.length]))
   };
 
-  const populationOptions = baseOptions({ legend: false, yLabel: 'Economically active population' });
-  populationOptions.plugins.tooltip.callbacks.label = ctx => `${formatNumber(ctx.parsed.y, 0)}`;
+  const populationOptions = baseOptions({ legend: false, yLabel: 'Economically Active Population (Thousand Person)' });
+  populationOptions.plugins.tooltip.callbacks.label = ctx => `${formatNumber(ctx.parsed.y, 0)} thousand person`;
   populationOptions.scales.y.ticks = { callback: v => compact(v) };
 
   return (
@@ -74,9 +74,9 @@ function Unemployment() {
       </div>
 
       <div className="stats-grid three">
-        <StatCard title="Highest unemployment" value={valid[0]?.region_name ?? '—'} description={valid[0] ? `${formatNumber(valid[0].unemployment_rate, 2)}%` : ''} />
-        <StatCard title="Lowest unemployment" value={valid.at(-1)?.region_name ?? '—'} description={valid.length ? `${formatNumber(valid.at(-1).unemployment_rate, 2)}%` : ''} />
-        <StatCard title="Average of cities" value={average !== null ? `${formatNumber(average, 2)}%` : '—'} description={`Year ${selectedYear ?? '—'}`} />
+        <StatCard title="Highest unemployment" value={valid[0]?.region_name ?? '??} description={valid[0] ? `${formatNumber(valid[0].unemployment_rate, 2)}%` : ''} />
+        <StatCard title="Lowest unemployment" value={valid.at(-1)?.region_name ?? '??} description={valid.length ? `${formatNumber(valid.at(-1).unemployment_rate, 2)}%` : ''} />
+        <StatCard title="Average of cities" value={average !== null ? `${formatNumber(average, 2)}%` : '??} description={`Year ${selectedYear ?? '??}`} />
       </div>
 
       <ChartCard title="Regional Unemployment Comparison" subtitle="Unemployment rate by major city" empty={data.length === 0}>
@@ -87,7 +87,7 @@ function Unemployment() {
         <Line data={lineData} options={lineOptions({ title: 'Unemployment rate by year', yLabel: 'Unemployment rate (%)', unit: '%' })} />
       </ChartCard>
 
-      <ChartCard title="Economically Active Population" subtitle={`By city · ${selectedYear ?? '—'}`} height={340} empty={withPopulation.length === 0}>
+      <ChartCard title="Economically Active Population" subtitle={`By city · ${selectedYear ?? '??} · (Thousand Person)`} height={340} empty={withPopulation.length === 0}>
         <Bar data={populationData} options={populationOptions} />
       </ChartCard>
     </div>

@@ -22,8 +22,8 @@ function About() {
 
         <h3>Database tables</h3>
         <ul>
-          <li>Lookup tables: REGION, GENDER, YEAR, INDUSTRY, ESTABLISHMENT_SIZE</li>
-          <li>Fact tables: REGIONAL_LABOR_STATS, INDUSTRY_LABOR_STATS</li>
+          <li>Lookup tables: REGION, GENDER, YEAR, INDUSTRY, ESTABLISHMENT SIZE</li>
+          <li>Fact tables: REGIONAL LABOR STATS, INDUSTRY LABOR STATS</li>
         </ul>
 
         <h3>Development technologies</h3>

@@ -154,8 +154,14 @@ router.get('/:name', route('table', async (req, res) => {
     fromSql = `${escapeId(name)} AS t`;
   }
 
-  const orderPrefix = wantReadable ? 's' : 't';
-  const orderBy = `${orderPrefix}.${escapeId(firstColumn)} ASC`;
+  let orderBy;
+  if (wantReadable && name === 'regional_labor_stats') {
+    // Group by region and year, then Male → Female → Total within each group
+    orderBy = `r.region_id ASC, y.year_value ASC, FIELD(g.gender_name, 'Male', 'Female', 'Total') ASC`;
+  } else {
+    const orderPrefix = wantReadable ? 's' : 't';
+    orderBy = `${orderPrefix}.${escapeId(firstColumn)} ASC`;
+  }
 
   let where = '';
   const params = [];

@@ -7,7 +7,7 @@ import ErrorBox from '../components/ErrorBox';
 import Select from '../components/Select';
 import useFetch from '../hooks/useFetch';
 import { getGenderEmployment, getGenderTrend, getGenderYears } from '../services/api';
-import { baseOptions, lineDataset, lineOptions, FEMALE_COLOR, MALE_COLOR } from '../utils/chartUtils';
+import { baseOptions, lineDataset, lineOptions, cleanLabel, FEMALE_COLOR, MALE_COLOR } from '../utils/chartUtils';
 
 function GenderAnalysis() {
   const [year, setYear] = useState('');
@@ -42,7 +42,7 @@ function GenderAnalysis() {
   const unemp = series('unemployment_rate');
 
   const grouped = (s) => ({
-    labels: regions,
+    labels: regions.map(cleanLabel),
     datasets: [
       { label: 'Male', data: s.male, backgroundColor: MALE_COLOR, borderRadius: 5 },
       { label: 'Female', data: s.female, backgroundColor: FEMALE_COLOR, borderRadius: 5 }
@@ -53,7 +53,7 @@ function GenderAnalysis() {
     emp.male[i] !== null && emp.female[i] !== null ? Number((emp.male[i] - emp.female[i]).toFixed(2)) : null
   );
   const gapData = {
-    labels: regions,
+    labels: regions.map(cleanLabel),
     datasets: [{ label: 'Male minus female (percentage points)', data: gapValues, backgroundColor: '#36a38a', borderRadius: 5 }]
   };
 

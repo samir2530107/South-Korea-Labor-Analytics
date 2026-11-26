@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 import ErrorBox from '../components/ErrorBox';
 import useFetch from '../hooks/useFetch';
 import { getDashboardSummary } from '../services/api';
-import { baseOptions, lineDataset, lineOptions, formatNumber, COLORS } from '../utils/chartUtils';
+import { baseOptions, lineDataset, lineOptions, formatNumber, cleanLabel, COLORS } from '../utils/chartUtils';
 
 function Dashboard() {
   const { data: summary, loading, error, reload } = useFetch(getDashboardSummary, []);
@@ -38,7 +38,7 @@ function Dashboard() {
   };
 
   const regionData = {
-    labels: regions.map(r => r.region_name),
+    labels: regions.map(r => cleanLabel(r.region_name)),
     datasets: [
       {
         label: 'Employment-to-population ratio (%)',
@@ -50,7 +50,7 @@ function Dashboard() {
   };
 
   const unemploymentData = {
-    labels: regions.map(r => r.region_name),
+    labels: regions.map(r => cleanLabel(r.region_name)),
     datasets: [
       {
         label: 'Unemployment rate (%)',
@@ -91,7 +91,7 @@ function Dashboard() {
         />
         <StatCard
           title="Latest Regional Year"
-          value={summary.latestYear ?? '—'}
+          value={summary.latestYear ?? '??}
           description="Most recent year with regional data"
           accent="purple"
         />
@@ -101,17 +101,17 @@ function Dashboard() {
         <div className="stats-grid three">
           <StatCard
             title={`Highest Employment (${summary.latestYear})`}
-            value={topEmployment ? topEmployment.region_name : '—'}
+            value={topEmployment ? topEmployment.region_name : '??}
             description={topEmployment ? `${formatNumber(topEmployment.employment_to_population_ratio)}% employment ratio` : ''}
           />
           <StatCard
             title={`Highest Unemployment (${summary.latestYear})`}
-            value={topUnemployment ? topUnemployment.region_name : '—'}
+            value={topUnemployment ? topUnemployment.region_name : '??}
             description={topUnemployment ? `${formatNumber(topUnemployment.unemployment_rate)}% unemployment rate` : ''}
           />
           <StatCard
             title={`Lowest Unemployment (${summary.latestYear})`}
-            value={lowUnemployment ? lowUnemployment.region_name : '—'}
+            value={lowUnemployment ? lowUnemployment.region_name : '??}
             description={lowUnemployment ? `${formatNumber(lowUnemployment.unemployment_rate)}% unemployment rate` : ''}
           />
         </div>
@@ -128,7 +128,7 @@ function Dashboard() {
       <div className="two-column">
         <ChartCard
           title="Employment by City"
-          subtitle={`Latest year (${summary.latestYear ?? '—'})`}
+          subtitle={`Latest year (${summary.latestYear ?? '??})`}
           height={340}
           empty={regions.length === 0}
         >
@@ -137,7 +137,7 @@ function Dashboard() {
 
         <ChartCard
           title="Unemployment by City"
-          subtitle={`Latest year (${summary.latestYear ?? '—'})`}
+          subtitle={`Latest year (${summary.latestYear ?? '??})`}
           height={340}
           empty={regions.length === 0}
         >
@@ -146,11 +146,11 @@ function Dashboard() {
       </div>
 
       <div className="quick-links">
-        <Link to="/regional" className="quick-link">Regional Employment →</Link>
-        <Link to="/gender" className="quick-link">Gender Analysis →</Link>
-        <Link to="/unemployment" className="quick-link">Unemployment →</Link>
-        <Link to="/industry" className="quick-link">Industry Analysis →</Link>
-        <Link to="/tables" className="quick-link strong">View Database Tables →</Link>
+        <Link to="/regional" className="quick-link">Regional Employment ??/Link>
+        <Link to="/gender" className="quick-link">Gender Analysis ??/Link>
+        <Link to="/unemployment" className="quick-link">Unemployment ??/Link>
+        <Link to="/industry" className="quick-link">Industry Analysis ??/Link>
+        <Link to="/tables" className="quick-link strong">View Database Tables ??/Link>
       </div>
     </div>
   );

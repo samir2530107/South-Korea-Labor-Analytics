@@ -9,7 +9,7 @@ import StatCard from '../components/StatCard';
 import DataTable from '../components/DataTable';
 import useFetch from '../hooks/useFetch';
 import { getIndustryMeta, getIndustryData, getIndustryTrend } from '../services/api';
-import { baseOptions, lineDataset, lineOptions, pivotByYear, formatNumber, compact, COLORS } from '../utils/chartUtils';
+import { baseOptions, lineDataset, lineOptions, pivotByYear, formatNumber, cleanLabel, compact, COLORS } from '../utils/chartUtils';
 
 function IndustryAnalysis() {
   const [year, setYear] = useState('');
@@ -111,9 +111,9 @@ function IndustryAnalysis() {
       </div>
 
       <div className="stats-grid three">
-        <StatCard title="Highest wages" value={topWage?.industry_name ?? '—'} description={topWage ? formatNumber(topWage.total_wages, 0) : ''} />
-        <StatCard title="Most hours worked" value={topHours?.industry_name ?? '—'} description={topHours ? formatNumber(topHours.total_hours_worked, 1) : ''} />
-        <StatCard title="Overtime share of hours" value={overtimeShare !== null ? `${formatNumber(overtimeShare, 1)}%` : '—'} description={`${sizeLabel} · ${selectedYear ?? '—'}`} />
+        <StatCard title="Highest wages" value={topWage?.industry_name ?? '??} description={topWage ? formatNumber(topWage.total_wages, 0) : ''} />
+        <StatCard title="Most hours worked" value={topHours?.industry_name ?? '??} description={topHours ? formatNumber(topHours.total_hours_worked, 1) : ''} />
+        <StatCard title="Overtime share of hours" value={overtimeShare !== null ? `${formatNumber(overtimeShare, 1)}%` : '??} description={`${sizeLabel} · ${selectedYear ?? '??}`} />
       </div>
 
       <ChartCard title="Wages by Industry" subtitle="Selected year and establishment size" height={barHeight} empty={withWages.length === 0} emptyText="No wage data for this year and size.">
@@ -135,7 +135,7 @@ function IndustryAnalysis() {
       <section className="chart-card">
         <div className="chart-card-header">
           <div>
-            <h3>Data for {selectedYear ?? '—'} · {sizeLabel}</h3>
+            <h3>Data for {selectedYear ?? '??} · {sizeLabel}</h3>
             <p>Rows used in the charts above</p>
           </div>
         </div>

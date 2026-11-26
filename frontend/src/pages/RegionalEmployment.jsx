@@ -9,7 +9,7 @@ import StatCard from '../components/StatCard';
 import DataTable from '../components/DataTable';
 import useFetch from '../hooks/useFetch';
 import { getRegionalEmployment, getRegionalTrend } from '../services/api';
-import { baseOptions, lineDataset, lineOptions, pivotByYear, formatNumber, COLORS } from '../utils/chartUtils';
+import { baseOptions, lineDataset, lineOptions, pivotByYear, formatNumber, cleanLabel, COLORS } from '../utils/chartUtils';
 
 const METRICS = {
   employment_to_population_ratio: 'Employment-to-population ratio (%)',
@@ -40,7 +40,7 @@ function RegionalEmployment() {
   const average = valid.length ? valid.reduce((s, r) => s + r[metric], 0) / valid.length : null;
 
   const barData = {
-    labels: sorted.map(r => r.region_name),
+    labels: sorted.map(r => cleanLabel(r.region_name)),
     datasets: [
       {
         label: METRICS[metric],
@@ -54,7 +54,7 @@ function RegionalEmployment() {
   const pivot = pivotByYear(trendRows, 'region_name', metric);
   const lineData = {
     labels: pivot.years,
-    datasets: pivot.datasets.map((d, i) => lineDataset(d.group, d.values, COLORS[i % COLORS.length]))
+    datasets: pivot.datasets.map((d, i) => lineDataset(cleanLabel(d.group), d.values, COLORS[i % COLORS.length]))
   };
 
   return (
@@ -81,14 +81,14 @@ function RegionalEmployment() {
       </div>
 
       <div className="stats-grid three">
-        <StatCard title="Highest" value={valid[0]?.region_name ?? '—'} description={valid[0] ? `${formatNumber(valid[0][metric], 2)}%` : ''} />
-        <StatCard title="Lowest" value={valid.at(-1)?.region_name ?? '—'} description={valid.length ? `${formatNumber(valid.at(-1)[metric], 2)}%` : ''} />
-        <StatCard title="Average of cities" value={average !== null ? `${formatNumber(average, 2)}%` : '—'} description={`Year ${selectedYear ?? '—'}`} />
+        <StatCard title="Highest" value={valid[0]?.region_name ?? '??} description={valid[0] ? `${formatNumber(valid[0][metric], 2)}%` : ''} />
+        <StatCard title="Lowest" value={valid.at(-1)?.region_name ?? '??} description={valid.length ? `${formatNumber(valid.at(-1)[metric], 2)}%` : ''} />
+        <StatCard title="Average of cities" value={average !== null ? `${formatNumber(average, 2)}%` : '??} description={`Year ${selectedYear ?? '??}`} />
       </div>
 
       <ChartCard
         title="Comparison by City"
-        subtitle={`${METRICS[metric]} · ${selectedYear ?? '—'}`}
+        subtitle={`${METRICS[metric]} · ${selectedYear ?? '??}`}
         empty={rows.length === 0}
       >
         <Bar data={barData} options={baseOptions({ title: `${METRICS[metric]} (${selectedYear ?? ''})`, legend: false, yLabel: METRICS[metric], unit: '%' })} />
@@ -105,7 +105,7 @@ function RegionalEmployment() {
       <section className="chart-card">
         <div className="chart-card-header">
           <div>
-            <h3>Data for {selectedYear ?? '—'}</h3>
+            <h3>Data for {selectedYear ?? '??}</h3>
             <p>Rows used in the charts above</p>
           </div>
         </div>

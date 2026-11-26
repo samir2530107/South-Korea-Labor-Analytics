@@ -4,6 +4,12 @@ export const COLORS = [
   '#a3c14a', '#c75bb0', '#4fb0e6', '#8a6d3b'
 ];
 
+// Strip underscores from any label/name string coming from the DB
+export function cleanLabel(value) {
+  if (typeof value === 'string') return value.replace(/_/g, ' ');
+  return value;
+}
+
 export const MALE_COLOR = '#3978d5';
 export const FEMALE_COLOR = '#e28aab';
 
