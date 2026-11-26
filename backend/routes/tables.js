@@ -47,9 +47,9 @@ const READABLE = {
       LEFT JOIN \`year\` AS y ON s.year_id = y.year_id
     `,
     lookups: [
+      { expr: 'y.year_value', alias: 'year_value' },
       { expr: 'r.region_name', alias: 'region_name' },
-      { expr: 'g.gender_name', alias: 'gender_name' },
-      { expr: 'y.year_value', alias: 'year_value' }
+      { expr: 'g.gender_name', alias: 'gender_name' }
     ],
     hide: ['region_id', 'gender_id', 'year_id']
   },
@@ -61,9 +61,9 @@ const READABLE = {
       LEFT JOIN \`year\` AS y ON s.year_id = y.year_id
     `,
     lookups: [
+      { expr: 'y.year_value', alias: 'year_value' },
       { expr: 'i.industry_name', alias: 'industry_name' },
-      { expr: 'es.size_category', alias: 'size_category' },
-      { expr: 'y.year_value', alias: 'year_value' }
+      { expr: 'es.size_category', alias: 'size_category' }
     ],
     hide: ['industry_id', 'size_id', 'year_id']
   }
@@ -130,10 +130,10 @@ router.get('/:name', route('table', async (req, res) => {
         alias: column
       }));
 
+    // Put lookup columns (Year, Region/Industry, Gender/Size) first, followed by data columns
     const all = [
-      ...own.slice(0, 1),
       ...cfg.lookups,
-      ...own.slice(1)
+      ...own
     ];
 
     selectList = all
@@ -156,8 +156,11 @@ router.get('/:name', route('table', async (req, res) => {
 
   let orderBy;
   if (wantReadable && name === 'regional_labor_stats') {
-    // Group by region and year, then Male → Female → Total within each group
-    orderBy = `r.region_id ASC, y.year_value ASC, FIELD(g.gender_name, 'Male', 'Female', 'Total') ASC`;
+    // Matches Excel layout: Year -> Region -> Male -> Female -> Total
+    orderBy = `y.year_value ASC, r.region_id ASC, FIELD(g.gender_name, 'Male', 'Female', 'Total') ASC`;
+  } else if (wantReadable && name === 'industry_labor_stats') {
+    // Matches Excel layout: Year -> Industry (Total first) -> Size (Total first)
+    orderBy = `y.year_value ASC, i.industry_id ASC, es.size_id ASC`;
   } else {
     const orderPrefix = wantReadable ? 's' : 't';
     orderBy = `${orderPrefix}.${escapeId(firstColumn)} ASC`;

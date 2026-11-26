@@ -12,9 +12,9 @@ import { getRegionalEmployment, getRegionalTrend } from '../services/api';
 import { baseOptions, lineDataset, lineOptions, pivotByYear, formatNumber, cleanLabel, COLORS } from '../utils/chartUtils';
 
 const METRICS = {
-  employment_to_population_ratio: 'Employment-to-population ratio (%)',
-  labor_force_participation_rate: 'Labor force participation rate (%)',
-  unemployment_rate: 'Unemployment rate (%)'
+  employment_to_population_ratio: 'Employment-to-Population Ratio (%)',
+  labor_force_participation_rate: 'Labor Force Participation Rate (%)',
+  unemployment_rate: 'Unemployment Rate (%)'
 };
 
 function RegionalEmployment() {
@@ -61,7 +61,7 @@ function RegionalEmployment() {
     <div className="page-content">
       <div className="welcome-section">
         <h2>Regional Employment Analysis</h2>
-        <p>Compare labor market indicators across South Korea's seven major cities.</p>
+        <p>Compare labor market indicators across South Korea&apos;s seven major cities.</p>
       </div>
 
       <div className="filter-bar">
@@ -81,14 +81,14 @@ function RegionalEmployment() {
       </div>
 
       <div className="stats-grid three">
-        <StatCard title="Highest" value={valid[0]?.region_name ?? '??} description={valid[0] ? `${formatNumber(valid[0][metric], 2)}%` : ''} />
-        <StatCard title="Lowest" value={valid.at(-1)?.region_name ?? '??} description={valid.length ? `${formatNumber(valid.at(-1)[metric], 2)}%` : ''} />
-        <StatCard title="Average of cities" value={average !== null ? `${formatNumber(average, 2)}%` : '??} description={`Year ${selectedYear ?? '??}`} />
+        <StatCard title="Highest" value={valid[0] ? cleanLabel(valid[0].region_name) : '\u2014'} description={valid[0] ? `${formatNumber(valid[0][metric], 2)}%` : ''} />
+        <StatCard title="Lowest" value={valid.at(-1) ? cleanLabel(valid.at(-1).region_name) : '\u2014'} description={valid.length ? `${formatNumber(valid.at(-1)[metric], 2)}%` : ''} />
+        <StatCard title="Average of Cities" value={average !== null ? `${formatNumber(average, 2)}%` : '\u2014'} description={`Year ${selectedYear ?? '\u2014'}`} />
       </div>
 
       <ChartCard
         title="Comparison by City"
-        subtitle={`${METRICS[metric]} · ${selectedYear ?? '??}`}
+        subtitle={`${METRICS[metric]} \u00b7 ${selectedYear ?? '\u2014'}`}
         empty={rows.length === 0}
       >
         <Bar data={barData} options={baseOptions({ title: `${METRICS[metric]} (${selectedYear ?? ''})`, legend: false, yLabel: METRICS[metric], unit: '%' })} />
@@ -105,7 +105,7 @@ function RegionalEmployment() {
       <section className="chart-card">
         <div className="chart-card-header">
           <div>
-            <h3>Data for {selectedYear ?? '??}</h3>
+            <h3>Data for {selectedYear ?? '\u2014'}</h3>
             <p>Rows used in the charts above</p>
           </div>
         </div>

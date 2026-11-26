@@ -32,8 +32,8 @@ function Dashboard() {
   const trendData = {
     labels: trend.map(t => t.year_value),
     datasets: [
-      lineDataset('Avg employment ratio (%)', trend.map(t => t.avg_employment), COLORS[0]),
-      lineDataset('Avg unemployment rate (%)', trend.map(t => t.avg_unemployment), COLORS[1])
+      lineDataset('Avg Employment Ratio (%)', trend.map(t => t.avg_employment), COLORS[0]),
+      lineDataset('Avg Unemployment Rate (%)', trend.map(t => t.avg_unemployment), COLORS[1])
     ]
   };
 
@@ -41,7 +41,7 @@ function Dashboard() {
     labels: regions.map(r => cleanLabel(r.region_name)),
     datasets: [
       {
-        label: 'Employment-to-population ratio (%)',
+        label: 'Employment-to-Population Ratio (%)',
         data: regions.map(r => r.employment_to_population_ratio),
         backgroundColor: COLORS[0],
         borderRadius: 6
@@ -53,7 +53,7 @@ function Dashboard() {
     labels: regions.map(r => cleanLabel(r.region_name)),
     datasets: [
       {
-        label: 'Unemployment rate (%)',
+        label: 'Unemployment Rate (%)',
         data: regions.map(r => r.unemployment_rate),
         backgroundColor: COLORS[1],
         borderRadius: 6
@@ -91,7 +91,7 @@ function Dashboard() {
         />
         <StatCard
           title="Latest Regional Year"
-          value={summary.latestYear ?? '??}
+          value={summary.latestYear ?? '\u2014'}
           description="Most recent year with regional data"
           accent="purple"
         />
@@ -101,17 +101,17 @@ function Dashboard() {
         <div className="stats-grid three">
           <StatCard
             title={`Highest Employment (${summary.latestYear})`}
-            value={topEmployment ? topEmployment.region_name : '??}
+            value={topEmployment ? cleanLabel(topEmployment.region_name) : '\u2014'}
             description={topEmployment ? `${formatNumber(topEmployment.employment_to_population_ratio)}% employment ratio` : ''}
           />
           <StatCard
             title={`Highest Unemployment (${summary.latestYear})`}
-            value={topUnemployment ? topUnemployment.region_name : '??}
+            value={topUnemployment ? cleanLabel(topUnemployment.region_name) : '\u2014'}
             description={topUnemployment ? `${formatNumber(topUnemployment.unemployment_rate)}% unemployment rate` : ''}
           />
           <StatCard
             title={`Lowest Unemployment (${summary.latestYear})`}
-            value={lowUnemployment ? lowUnemployment.region_name : '??}
+            value={lowUnemployment ? cleanLabel(lowUnemployment.region_name) : '\u2014'}
             description={lowUnemployment ? `${formatNumber(lowUnemployment.unemployment_rate)}% unemployment rate` : ''}
           />
         </div>
@@ -128,7 +128,7 @@ function Dashboard() {
       <div className="two-column">
         <ChartCard
           title="Employment by City"
-          subtitle={`Latest year (${summary.latestYear ?? '??})`}
+          subtitle={`Latest year (${summary.latestYear ?? '\u2014'})`}
           height={340}
           empty={regions.length === 0}
         >
@@ -137,7 +137,7 @@ function Dashboard() {
 
         <ChartCard
           title="Unemployment by City"
-          subtitle={`Latest year (${summary.latestYear ?? '??})`}
+          subtitle={`Latest year (${summary.latestYear ?? '\u2014'})`}
           height={340}
           empty={regions.length === 0}
         >
@@ -146,11 +146,11 @@ function Dashboard() {
       </div>
 
       <div className="quick-links">
-        <Link to="/regional" className="quick-link">Regional Employment ??/Link>
-        <Link to="/gender" className="quick-link">Gender Analysis ??/Link>
-        <Link to="/unemployment" className="quick-link">Unemployment ??/Link>
-        <Link to="/industry" className="quick-link">Industry Analysis ??/Link>
-        <Link to="/tables" className="quick-link strong">View Database Tables ??/Link>
+        <Link to="/regional" className="quick-link">Regional Employment &rarr;</Link>
+        <Link to="/gender" className="quick-link">Gender Analysis &rarr;</Link>
+        <Link to="/unemployment" className="quick-link">Unemployment &rarr;</Link>
+        <Link to="/industry" className="quick-link">Industry Analysis &rarr;</Link>
+        <Link to="/tables" className="quick-link strong">View Database Tables &rarr;</Link>
       </div>
     </div>
   );
