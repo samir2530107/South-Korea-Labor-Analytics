@@ -171,9 +171,25 @@ function ViewTables() {
               </div>
             </div>
             <ul>
-              <li><strong>What is &ldquo;Total&rdquo; Industry?</strong> The national aggregate across all surveyed non-agricultural commercial industries in South Korea.</li>
-              <li><strong>What is &ldquo;Total (1 permanent employee or more)&rdquo;?</strong> The combined aggregate across all surveyed business establishment sizes with at least 1 regular worker.</li>
-              <li><strong>Sub-categories:</strong> Compare enterprise scale tiers (&minus;10, &minus;30, and 300+ permanent workers) against working hours (Regular/Overtime), working days, and monthly wage levels (in KRW Won).</li>
+              {colGroup === 'wages' && (
+                <>
+                  <li><strong>Total Wages (Won):</strong> The average monthly gross pay per worker, which equals <strong>Regular Payments + Overtime Payments + Special Payments/Bonuses</strong>.</li>
+                  <li><strong>Total Wages: Permanent Employees:</strong> The exact same per-worker monthly average, filtered strictly for regular/permanent workers (excluding temporary and daily workers). Because permanent workers earn more on average than temporary workers, this number is slightly higher than the overall average.</li>
+                </>
+              )}
+              {colGroup === 'hours' && (
+                <li><strong>Total Hours Worked (Hour):</strong> The average monthly hours worked per worker, which equals <strong>Regular Hours + Overtime Hours</strong>.</li>
+              )}
+              {colGroup === 'days' && (
+                <li><strong>Total Days Worked (Day):</strong> The average monthly working days per worker across the selected industry and establishment size.</li>
+              )}
+              {(colGroup === 'all' || colGroup === 'overview') && (
+                <>
+                  <li><strong>What is &ldquo;Total&rdquo; Industry?</strong> The national aggregate across all surveyed non-agricultural commercial industries in South Korea.</li>
+                  <li><strong>What is &ldquo;Total (1 permanent employee or more)&rdquo;?</strong> The combined aggregate across all surveyed business establishment sizes with at least 1 regular worker.</li>
+                  <li><strong>Sub-categories:</strong> Compare enterprise scale tiers (&minus;10, &minus;30, and 300+ permanent workers) against working hours (Regular/Overtime), working days, and monthly wage levels (in KRW Won).</li>
+                </>
+              )}
             </ul>
           </div>
         )}
