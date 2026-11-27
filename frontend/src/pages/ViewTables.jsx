@@ -173,17 +173,30 @@ function ViewTables() {
             <ul>
               {colGroup === 'wages' && (
                 <>
-                  <li><strong>Total Wages (Won):</strong> The average monthly gross pay per worker, which equals <strong>Regular Payments + Overtime Payments + Special Payments/Bonuses</strong>.</li>
-                  <li><strong>Total Wages: Permanent Employees:</strong> The exact same per-worker monthly average, filtered strictly for regular/permanent workers (excluding temporary and daily workers). Because permanent workers earn more on average than temporary workers, this number is slightly higher than the overall average.</li>
+                  <li><strong>Total Wages (All Workers):</strong> The monthly average pay across <strong>all</strong> workers (permanent + temporary &amp; daily). Because temporary/daily workers usually earn less, this overall average is <strong>lower</strong> than the permanent-only sum.</li>
+                  <li><strong>Permanent Employee Wages:</strong> The monthly average pay for <strong>permanent workers only</strong>, which equals <strong>Regular Wages + Overtime Wages + Special Wages</strong>.</li>
                 </>
               )}
               {colGroup === 'hours' && (
-                <li><strong>Total Hours Worked (Hour):</strong> The average monthly hours worked per worker, which equals <strong>Regular Hours + Overtime Hours</strong>.</li>
+                <>
+                  <li><strong>Total Hours Worked (All Workers):</strong> The monthly average hours worked across <strong>all</strong> workers (permanent + temporary &amp; daily). Because temporary/daily workers work fewer hours on average, this overall average is <strong>lower</strong> than the permanent-only sum.</li>
+                  <li><strong>Permanent Employee Hours:</strong> The monthly average hours for <strong>permanent workers only</strong>, which equals <strong>Regular Hours + Overtime Hours</strong>.</li>
+                </>
               )}
               {colGroup === 'days' && (
-                <li><strong>Total Days Worked (Day):</strong> The average monthly working days per worker across the selected industry and establishment size.</li>
+                <>
+                  <li><strong>Total Days Worked (All Workers):</strong> The average monthly working days per worker across <strong>all</strong> workers (permanent + temporary &amp; daily).</li>
+                  <li><strong>Permanent vs. Temporary/Daily Days:</strong> Compares average monthly working days for permanent staff against temporary &amp; daily workers.</li>
+                </>
               )}
-              {(colGroup === 'all' || colGroup === 'overview') && (
+              {colGroup === 'overview' && (
+                <>
+                  <li><strong>Key Summary View:</strong> Shows the main monthly per-worker averages (<strong>Total Days</strong>, <strong>Total Hours</strong>, <strong>Total Wages</strong>, and <strong>Permanent Employee Wages</strong>) side-by-side at a glance.</li>
+                  <li><strong>Why is Total Wages lower than Permanent Employee Wages?</strong> <em>Total Wages</em> averages <strong>all</strong> workers (including temporary &amp; daily workers), while <em>Permanent Employee Wages</em> covers regular full-time staff only.</li>
+                  <li><strong>Tip:</strong> Click <strong>Wages Focus</strong>, <strong>Working Hours</strong>, or <strong>Working Days</strong> above to see the detailed breakdowns.</li>
+                </>
+              )}
+              {colGroup === 'all' && (
                 <>
                   <li><strong>What is &ldquo;Total&rdquo; Industry?</strong> The national aggregate across all surveyed non-agricultural commercial industries in South Korea.</li>
                   <li><strong>What is &ldquo;Total (1 permanent employee or more)&rdquo;?</strong> The combined aggregate across all surveyed business establishment sizes with at least 1 regular worker.</li>
