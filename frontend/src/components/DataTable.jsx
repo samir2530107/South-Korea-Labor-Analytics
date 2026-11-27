@@ -1,5 +1,6 @@
 
 // All known column → human-readable label mappings matching official government statistical surveys
+// All known column → human-readable label mappings matching official government statistical surveys
 const COLUMN_LABELS = {
   region_id: 'ID',
   gender_id: 'ID',
@@ -12,32 +13,33 @@ const COLUMN_LABELS = {
   year_value: 'Year',
   size_category: 'Establishment Size',
   industry_name: 'Industry',
-  population_15_plus: 'Population 15+ (Thousand Person)',
-  economically_active_population: 'Economically Active Population (Thousand Person)',
-  economically_inactive_population: 'Economically Inactive Population (Thousand Person)',
-  employed_population: 'Employed Population (Thousand Person)',
-  unemployed_population: 'Unemployed Population (Thousand Person)',
-  labor_force_participation_rate: 'Labor Force Participation Rate (%)',
-  employment_to_population_ratio: 'Employment-to-Population Ratio (%)',
-  employment_to_population_ratio_15_64: 'Employment-to-Population Ratio (15~64) (%)',
+  population_15_plus: 'Population 15+ (Thousands)',
+  economically_active_population: 'Econ. Active Pop. (Thousands)',
+  economically_inactive_population: 'Econ. Inactive Pop. (Thousands)',
+  employed_population: 'Employed Pop. (Thousands)',
+  unemployed_population: 'Unemployed Pop. (Thousands)',
+  labor_force_participation_rate: 'Labor Participation Rate (%)',
+  employment_to_population_ratio: 'Employment-to-Pop. Ratio (%)',
+  employment_to_population_ratio_15_64: 'Employment Ratio 15~64 (%)',
   unemployment_rate: 'Unemployment Rate (%)',
   employment_rate: 'Employment Rate (%)',
-  // Industry survey metrics (Days, Hours, Wages in KRW Won)
-  total_days_worked: 'Total Days Worked (Day)',
-  permanent_employee_days_worked: 'Days Worked: Permanent Employees (Day)',
-  temporary_daily_employee_days_worked: 'Days Worked: Temp & Daily Employees (Day)',
-  total_hours_worked: 'Total Hours Worked (Hour)',
-  permanent_employee_hours_worked: 'Hours Worked: Permanent Employees (Hour)',
-  regular_hours_worked: 'Regular Hours Worked: Permanent (Hour)',
-  overtime_hours_worked: 'Overtime Hours Worked: Permanent (Hour)',
-  temporary_daily_employee_hours_worked: 'Hours Worked: Temp & Daily (Hour)',
-  total_wages: 'Total Wages (Won)',
-  permanent_employee_wages: 'Total Wages: Permanent Employees (Won)',
-  regular_wages: 'Regular Wages: Permanent (Won)',
-  overtime_wages: 'Overtime Wages: Permanent (Won)',
-  special_wages: 'Special Wages: Permanent (Won)',
-  temporary_daily_employee_wages: 'Total Wages: Temp & Daily (Won)'
+  // Industry survey metrics (Compact, scannable headers)
+  total_days_worked: 'Total Days',
+  permanent_employee_days_worked: 'Days (Permanent)',
+  temporary_daily_employee_days_worked: 'Days (Temp/Daily)',
+  total_hours_worked: 'Total Hours',
+  permanent_employee_hours_worked: 'Hours (Permanent)',
+  regular_hours_worked: 'Regular Hrs (Perm.)',
+  overtime_hours_worked: 'Overtime Hrs (Perm.)',
+  temporary_daily_employee_hours_worked: 'Hours (Temp/Daily)',
+  total_wages: 'Total Wages (₩)',
+  permanent_employee_wages: 'Wages: Permanent (₩)',
+  regular_wages: 'Regular Wages (₩)',
+  overtime_wages: 'Overtime Wages (₩)',
+  special_wages: 'Special Wages (₩)',
+  temporary_daily_employee_wages: 'Wages: Temp/Daily (₩)'
 };
+
 
 // Columns where values are rates/ratios — append % if numeric
 const RATE_COLS = new Set([
@@ -73,6 +75,17 @@ function renderCell(column, value) {
     return <span className="null-cell">—</span>;
   }
   const cleaned = cleanValue(value);
+
+  // 1. Prevent commas in Year (e.g., 2020 instead of 2,020)
+  if (column === 'year_value') {
+    return String(value);
+  }
+
+  // 2. Strip leading hyphens from Establishment Size (e.g., "-10..." -> "10...")
+  if (column === 'size_category' && typeof cleaned === 'string') {
+    return cleaned.replace(/^-+/, '').trim();
+  }
+
   if (RATE_COLS.has(column) && typeof value === 'number') {
     return `${cleaned}%`;
   }
@@ -81,9 +94,6 @@ function renderCell(column, value) {
   }
   if (typeof value === 'number') {
     return Number(value).toLocaleString();
-  }
-  if (column === 'size_category' && typeof cleaned === 'string') {
-    return cleaned.trim();
   }
   return String(cleaned);
 }
