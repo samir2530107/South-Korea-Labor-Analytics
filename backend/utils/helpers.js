@@ -21,9 +21,11 @@ function route(name, handler) {
       await handler(req, res);
     } catch (error) {
       console.error(`${name} error:`, error.message);
-      res.status(500).json({
+      const unavailable = ['ECONNREFUSED', 'ETIMEDOUT', 'ER_ACCESS_DENIED_ERROR', 'ER_BAD_DB_ERROR']
+        .includes(error.code);
+      res.status(unavailable ? 503 : 500).json({
         success: false,
-        message: `Unable to retrieve ${name} data. Check that MySQL is running and the database is imported.`
+        message: `Unable to retrieve ${name} data. Check that MySQL is running and backend/.env points to the imported database.`
       });
     }
   };

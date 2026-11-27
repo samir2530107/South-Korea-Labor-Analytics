@@ -1,8 +1,31 @@
-import { Chart, registerables } from 'chart.js';
+import {
+  BarController,
+  BarElement,
+  CategoryScale,
+  Chart,
+  Legend,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip
+} from 'chart.js';
 
-Chart.register(...registerables);
+Chart.register(
+  BarController,
+  BarElement,
+  CategoryScale,
+  Legend,
+  LinearScale,
+  LineController,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip
+);
 
-Chart.defaults.font.family = "'Segoe UI', Arial, Helvetica, sans-serif";
-Chart.defaults.font.size = 12;
-Chart.defaults.color = '#59677a';
-Chart.defaults.animation.duration = 500;
+Chart.defaults.font.family = "Inter, ui-sans-serif, system-ui, 'Segoe UI', sans-serif";
+Chart.defaults.font.size = 11;
+Chart.defaults.color = '#60748d';
+Chart.defaults.animation.duration = 450;

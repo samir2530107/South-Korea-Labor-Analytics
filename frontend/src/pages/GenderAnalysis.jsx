@@ -84,10 +84,13 @@ function GenderAnalysis() {
 
   return (
     <div className="page-content">
-      <div className="welcome-section">
-        <h2>Gender Analysis</h2>
-        <p>Compare male and female labor market conditions across South Korea's seven major cities.</p>
-      </div>
+      <section className="welcome-section">
+        <div className="welcome-copy">
+          <span className="eyebrow">GENDER ANALYSIS</span>
+          <h2>Compare male and female outcomes</h2>
+          <p>Explore employment and unemployment gaps across South Korea's major cities.</p>
+        </div>
+      </section>
 
       <div className="filter-bar">
         <Select
@@ -100,7 +103,7 @@ function GenderAnalysis() {
           label="City (trend charts)"
           value={activeRegion}
           onChange={setRegion}
-          options={trendRegions.map(r => ({ value: r, label: r }))}
+          options={trendRegions.map(r => ({ value: r, label: cleanLabel(r) }))}
         />
         <span className="filter-note">Categories: Male and Female</span>
       </div>
@@ -118,10 +121,10 @@ function GenderAnalysis() {
       </ChartCard>
 
       <div className="two-column">
-        <ChartCard title={`Employment Trend · ${activeRegion ?? ''}`} subtitle="Male vs female over time" height={340} empty={regionTrend.length === 0}>
+        <ChartCard title={`Employment Trend · ${cleanLabel(activeRegion ?? '')}`} subtitle="Male vs female over time" height={340} empty={regionTrend.length === 0}>
           <Line data={empTrend} options={lineOptions({ yLabel: 'Employment ratio (%)', unit: '%' })} />
         </ChartCard>
-        <ChartCard title={`Unemployment Trend · ${activeRegion ?? ''}`} subtitle="Male vs female over time" height={340} empty={regionTrend.length === 0}>
+        <ChartCard title={`Unemployment Trend · ${cleanLabel(activeRegion ?? '')}`} subtitle="Male vs female over time" height={340} empty={regionTrend.length === 0}>
           <Line data={unempTrend} options={lineOptions({ yLabel: 'Unemployment rate (%)', unit: '%' })} />
         </ChartCard>
       </div>

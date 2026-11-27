@@ -1,6 +1,6 @@
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+// Local/preview requests use Vite's same-origin proxy. Production can provide the API URL at build time.
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/$/, '');
 
 async function fetchAPI(endpoint, params = {}) {
   const query = new URLSearchParams();

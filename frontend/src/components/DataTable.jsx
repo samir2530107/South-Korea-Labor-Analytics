@@ -1,5 +1,5 @@
+import { formatNumber } from '../utils/chartUtils';
 
-// All known column → human-readable label mappings
 const COLUMN_LABELS = {
   region_id: 'ID',
   gender_id: 'ID',
@@ -10,68 +10,102 @@ const COLUMN_LABELS = {
   region_name: 'Region',
   gender_name: 'Gender',
   year_value: 'Year',
-  size_category: 'Establishment Size',
+  size_category: 'Establishment size',
   industry_name: 'Industry',
-  population_15_plus: 'Population 15+ (Thousand Person)',
-  economically_active_population: 'Economically Active Population (Thousand Person)',
-  economically_inactive_population: 'Economically Inactive Population (Thousand Person)',
-  employed_population: 'Employed Population (Thousand Person)',
-  unemployed_population: 'Unemployed Population (Thousand Person)',
-  labor_force_participation_rate: 'Labor Force Participation Rate (%)',
-  employment_to_population_ratio: 'Employment-to-Population Ratio (%)',
-  unemployment_rate: 'Unemployment Rate (%)',
-  employment_rate: 'Employment Rate (%)',
-  total_wages: 'Total Wages',
-  total_hours_worked: 'Total Hours Worked',
-  regular_hours_worked: 'Regular Hours Worked',
-  overtime_hours_worked: 'Overtime Hours Worked',
-  total_days_worked: 'Total Days Worked'
+  population_15_plus: 'Population 15+ (thousand persons)',
+  economically_active_population: 'Economically active population (thousand persons)',
+  economically_inactive_population: 'Economically inactive population (thousand persons)',
+  employed_population: 'Employed population (thousand persons)',
+  unemployed_population: 'Unemployed population (thousand persons)',
+  total_wages: 'Total wages (Won / worker / month)',
+  total_hours_worked: 'Total hours worked (hours / worker / month)',
+  regular_hours_worked: 'Regular hours (hours / worker / month)',
+  overtime_hours_worked: 'Overtime hours (hours / worker / month)',
+  total_days_worked: 'Total days worked (days / worker / month)',
+
+  labor_force_participation_rate: 'Labor force participation rate (%)',
+  employment_to_population_ratio: 'Employment-to-population ratio (%)',
+  unemployment_rate: 'Unemployment rate (%)',
+  employment_rate: 'Employment rate (%)'
 };
 
-// Columns where values are rates/ratios — append % if numeric
-const RATE_COLS = new Set([
+const RATE_COLUMNS = new Set([
   'labor_force_participation_rate',
   'employment_to_population_ratio',
   'unemployment_rate',
   'employment_rate'
 ]);
 
-function formatColumnName(col) {
-  if (COLUMN_LABELS[col]) return COLUMN_LABELS[col];
-  return col.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+const CURRENCY_COLUMNS = new Set(['total_wages']);
+
+const ONE_DECIMAL_COLUMNS = new Set([
+  'total_hours_worked',
+  'regular_hours_worked',
+  'overtime_hours_worked',
+  'total_days_worked'
+]);
+
+const NUMERIC_COLUMNS = new Set([
+  'population_15_plus',
+  'economically_active_population',
+  'economically_inactive_population',
+  'employed_population',
+  'unemployed_population',
+  'total_wages',
+  'total_hours_worked',
+  'regular_hours_worked',
+  'overtime_hours_worked',
+  'total_days_worked'
+]);
+
+function formatColumnName(column) {
+  if (COLUMN_LABELS[column]) return COLUMN_LABELS[column];
+  return column.replace(/_/g, ' ').replace(/\b\w/g, character => character.toUpperCase());
 }
 
-// Strip underscores from string display values
 function cleanValue(value) {
-  if (typeof value === 'string') return value.replace(/_/g, ' ');
-  return value;
+  return typeof value === 'string' ? value.replace(/_/g, ' ') : value;
+}
+
+function numericValue(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
 }
 
 function renderCell(column, value) {
-  if (value === null || value === undefined) {
-    return <span className="null-cell">—</span>;
+  if (value === null || value === undefined || value === '') {
+    return <span className="null-cell">Not available</span>;
   }
+
   const cleaned = cleanValue(value);
-  if (RATE_COLS.has(column) && typeof value === 'number') {
-    return `${cleaned}%`;
+  const numeric = numericValue(value);
+  if (RATE_COLUMNS.has(column) && numeric !== null) {
+    return `${formatNumber(numeric, 2)}%`;
+  }
+  if (CURRENCY_COLUMNS.has(column) && numeric !== null) {
+    return `₩${formatNumber(numeric, 0)}`;
+  }
+  if (NUMERIC_COLUMNS.has(column) && numeric !== null) {
+    return formatNumber(numeric, ONE_DECIMAL_COLUMNS.has(column) ? 1 : 2);
   }
   return String(cleaned);
 }
 
-// DataTable accepts an optional `presorted` prop.
-// When true (ViewTables paginated view), we trust the backend order and do NOT re-sort.
-// When false (default), we sort so Male → Female → Total appear together per region+year.
 function sortWithTotals(columns, rows) {
   if (!columns.includes('gender_name') || !columns.includes('region_name')) return rows;
-  const ORDER = { Male: 0, Female: 1, Total: 2 };
+  const genderOrder = { male: 0, female: 1, total: 2 };
+
   return [...rows].sort((a, b) => {
-    const rCmp = String(a.region_name ?? '').localeCompare(String(b.region_name ?? ''));
-    if (rCmp !== 0) return rCmp;
-    const yCmp = (a.year_value ?? 0) - (b.year_value ?? 0);
-    if (yCmp !== 0) return yCmp;
-    const ga = ORDER[String(a.gender_name).trim()] ?? 99;
-    const gb = ORDER[String(b.gender_name).trim()] ?? 99;
-    return ga - gb;
+    const regionOrder = String(a.region_name ?? '').localeCompare(String(b.region_name ?? ''));
+    if (regionOrder !== 0) return regionOrder;
+
+    const yearOrder = (numericValue(a.year_value) ?? 0) - (numericValue(b.year_value) ?? 0);
+    if (yearOrder !== 0) return yearOrder;
+
+    const genderA = String(a.gender_name ?? '').trim().replace(/_/g, ' ').toLowerCase();
+    const genderB = String(b.gender_name ?? '').trim().replace(/_/g, ' ').toLowerCase();
+    return (genderOrder[genderA] ?? 99) - (genderOrder[genderB] ?? 99);
   });
 }
 
@@ -80,7 +114,8 @@ function DataTable({ columns, rows, startIndex = 0, presorted = false }) {
     return <div className="empty-state">No rows to display.</div>;
   }
 
-  const displayRows = presorted ? rows : sortWithTotals(columns, rows);
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const displayRows = presorted ? safeRows : sortWithTotals(columns, safeRows);
   const hasGender = columns.includes('gender_name');
 
   return (
@@ -88,9 +123,9 @@ function DataTable({ columns, rows, startIndex = 0, presorted = false }) {
       <table className="data-table">
         <thead>
           <tr>
-            <th className="row-number">#</th>
-            {columns.map(col => (
-              <th key={col}>{formatColumnName(col)}</th>
+            <th className="row-number" scope="col">#</th>
+            {columns.map(column => (
+              <th key={column} scope="col">{formatColumnName(column)}</th>
             ))}
           </tr>
         </thead>
@@ -102,15 +137,15 @@ function DataTable({ columns, rows, startIndex = 0, presorted = false }) {
               </td>
             </tr>
           ) : (
-            displayRows.map((row, i) => {
-              const genderVal = String(row.gender_name ?? '').trim();
-              const isTotal = hasGender && (genderVal === 'Total' || genderVal.replace(/_/g, ' ') === 'Total');
-              const isMale = hasGender && genderVal === 'Male';
+            displayRows.map((row, index) => {
+              const gender = String(row.gender_name ?? '').trim().replace(/_/g, ' ').toLowerCase();
+              const isTotal = hasGender && gender === 'total';
+              const isMale = hasGender && gender === 'male';
               return (
-                <tr key={i} className={isTotal ? 'row-total' : isMale ? 'row-male' : ''}>
-                  <td className="row-number">{startIndex + i + 1}</td>
-                  {columns.map(col => (
-                    <td key={col}>{renderCell(col, row[col])}</td>
+                <tr key={row.stat_id ?? `${row.region_name ?? ''}-${row.year_value ?? ''}-${gender}-${index}`} className={isTotal ? 'row-total' : isMale ? 'row-male' : ''}>
+                  <td className="row-number">{startIndex + index + 1}</td>
+                  {columns.map(column => (
+                    <td key={column}>{renderCell(column, row[column])}</td>
                   ))}
                 </tr>
               );

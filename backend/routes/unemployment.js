@@ -1,13 +1,14 @@
-
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { toInt, num, route } = require('../utils/helpers');
+const { toInt, route } = require('../utils/helpers');
+const {
+  normalizeRegionalRows,
+  regionalSelectSql,
+  summarizeQuality
+} = require('../utils/regionalQuality');
 
-// GET /api/unemployment?year=2024
 router.get('/', route('unemployment', async (req, res) => {
-
-  // Get years containing regional data
   const [yearRows] = await db.query(`
     SELECT DISTINCT y.year_value
     FROM regional_labor_stats s
@@ -17,7 +18,6 @@ router.get('/', route('unemployment', async (req, res) => {
 
   const years = yearRows.map(row => row.year_value);
   const requested = toInt(req.query.year);
-
   const year = requested && years.includes(requested)
     ? requested
     : years[0] ?? null;
@@ -27,38 +27,45 @@ router.get('/', route('unemployment', async (req, res) => {
       success: true,
       year: null,
       years,
-      data: []
+      data: [],
+      dataQuality: summarizeQuality([], 0)
     });
   }
 
-  // Get unemployment data for all regions (Total gender)
-  const [rows] = await db.query(`
+  const [sourceRows] = await db.query(`
     SELECT
+      r.region_id,
       r.region_name,
+      g.gender_name,
       y.year_value,
-      s.unemployment_rate,
-      s.economically_active_population
+      ${regionalSelectSql()}
     FROM regional_labor_stats s
     JOIN region r ON s.region_id = r.region_id
     JOIN gender g ON s.gender_id = g.gender_id
     JOIN \`year\` y ON s.year_id = y.year_id
-    WHERE g.gender_name = 'Total'
+    WHERE g.gender_name IN ('Male', 'Female', 'Total')
       AND y.year_value = ?
-    ORDER BY s.unemployment_rate DESC, r.region_id
+    ORDER BY r.region_id, FIELD(g.gender_name, 'Male', 'Female', 'Total')
   `, [year]);
+
+  const { data: totals, issues } = normalizeRegionalRows(sourceRows);
+  const data = totals
+    .map(row => ({
+      region_id: row.region_id,
+      region_name: row.region_name,
+      year_value: row.year_value,
+      unemployment_rate: row.unemployment_rate,
+      economically_active_population: row.economically_active_population
+    }))
+    .sort((a, b) => (b.unemployment_rate ?? -Infinity) - (a.unemployment_rate ?? -Infinity));
 
   res.json({
     success: true,
     year,
     years,
-    data: rows.map(row => ({
-      region_name: row.region_name,
-      year_value: row.year_value,
-      unemployment_rate: num(row.unemployment_rate),
-      economically_active_population: num(row.economically_active_population)
-    }))
+    data,
+    dataQuality: summarizeQuality(issues, data.length)
   });
-
 }));
 
 module.exports = router;

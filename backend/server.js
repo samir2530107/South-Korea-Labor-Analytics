@@ -60,12 +60,12 @@ app.get('/api/health', async (req, res) => {
       server: 'ok',
       database: 'connected'
     });
-  } catch (error) {
+  } catch {
     res.status(503).json({
       success: false,
       server: 'ok',
       database: 'disconnected',
-      message: error.message
+      message: 'The API is running, but MySQL is unavailable. Check the database service and DB_* settings.'
     });
   }
 });
@@ -106,7 +106,7 @@ process.on('uncaughtException', error => {
 });
 
 // Start server
-const server = app.listen(PORT, async () => {
+const server = app.listen(PORT, '0.0.0.0', async () => {
   console.log('--------------------------------------');
   console.log('South Korea Labor Analytics API');
   console.log(`Server:   http://localhost:${PORT}`);
@@ -117,7 +117,7 @@ const server = app.listen(PORT, async () => {
     console.log('MySQL:    connected');
   } catch (error) {
     console.log(`MySQL:    NOT CONNECTED (${error.code || error.message})`);
-    console.log('          Check backend/config/db.js');
+    console.log('          Check backend/.env and the MySQL service');
   }
 
   console.log('--------------------------------------');

@@ -8,7 +8,7 @@ const pageTitles = {
   '/gender': 'Gender Analysis',
   '/unemployment': 'Unemployment Analysis',
   '/industry': 'Industry Analysis',
-  '/tables': 'View Database Tables',
+  '/tables': 'Database Tables',
   '/about': 'About the Project'
 };
 
@@ -25,34 +25,33 @@ function Header() {
         .then(() => active && setStatus('online'))
         .catch(error => {
           if (!active) return;
-          setStatus(error.message.includes('backend') ? 'offline' : 'nodb');
+          setStatus(error.message.toLowerCase().includes('backend') ? 'offline' : 'nodb');
         });
     };
 
     check();
-    const id = setInterval(check, 15000);
+    const interval = setInterval(check, 30000);
     return () => {
       active = false;
-      clearInterval(id);
+      clearInterval(interval);
     };
   }, []);
 
   const labels = {
-    checking: 'Checking...',
-    online: 'Database connected',
-    nodb: 'MySQL not connected',
-    offline: 'Backend offline'
+    checking: 'Checking connection…',
+    online: 'Live data connected',
+    nodb: 'Database unavailable',
+    offline: 'API unavailable'
   };
 
   return (
     <header className="header">
-      <div>
+      <div className="header-title">
+        <span className="header-kicker">SOUTH KOREA LABOR ANALYTICS</span>
         <h1>{title}</h1>
-        <p>South Korea Labor Market Analysis</p>
       </div>
-
-      <div className={`header-tag status-${status}`}>
-        <span className="status-dot"></span>
+      <div className={`header-tag status-${status}`} role="status" title={labels[status]}>
+        <span className="status-dot" aria-hidden="true" />
         {labels[status]}
       </div>
     </header>
